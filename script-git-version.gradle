@@ -1,0 +1,29 @@
+/**
+ * Creates versionName from the latest tag in GIT
+ */
+project.ext.evalVersionName = {
+    // git describe --tags $(git rev-list --tags --max-count=1)
+    def p = Runtime.getRuntime().exec("git describe --abbrev=0 --tags")
+
+    def result = p.waitFor()
+    if (result != 0) {
+        return "v0.0.0" // no git revisions
+    }
+    return p.getInputStream().readLines().get(0)
+}
+
+/**
+ * Creates versionCode from number of commits in GIT
+ */
+project.ext.evalVersionCode = {
+    // number of commits from HEAD to oldest one, useful for releasing from one branch only
+    // def p = Runtime.getRuntime().exec("git rev-list HEAD --count")
+    // number of commit in all branches together (also dead one)
+    def p = Runtime.getRuntime().exec("git rev-list --all --count")
+
+    def result = p.waitFor()
+    if (result != 0) {
+        return 0 // no git revisions
+    }
+    return p.getInputStream().readLines().get(0).toInteger()
+}
